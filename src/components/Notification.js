@@ -1,5 +1,6 @@
 import propTypes from 'prop-types'
 import React from 'react'
+import { connect } from 'react-redux'
 
 function Notification({ message, isError }) {
     return (
@@ -7,7 +8,12 @@ function Notification({ message, isError }) {
     )
 }
 
-export default Notification
+const mapStateToProps = state => {
+    const { message, isError } = state.notification
+    return { message, isError }
+}
+
+export default connect(mapStateToProps)(Notification)
 
 Notification.propTypes = {
     message: propTypes.string,

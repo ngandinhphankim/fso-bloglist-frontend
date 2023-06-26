@@ -6,8 +6,11 @@ import authService from './services/auth'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import LoginForm from './components/LoginForm'
+import { connect } from 'react-redux'
+import { setNoti } from './redux/actions'
+import propTypes from 'prop-types'
 
-const App = () => {
+const App = ({ setNoti }) => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -60,6 +63,7 @@ const App = () => {
       const savedBlog = await blogService.createOne(newBlog)
       setBlogs(blogs.concat(savedBlog))
       setNotification({ message: `a new blog ${savedBlog.title} by ${savedBlog.author} added`, isError: false })
+      setNoti({ message: `a new blog ${savedBlog.title} by ${savedBlog.author} added`, isError: false })
     } catch (exception) {
       setNotification({ message: exception.response.data.error, isError: true })
     }
@@ -84,7 +88,8 @@ const App = () => {
   return (
     <>
       <h1>blogs</h1>
-      {notification && <Notification message={notification.message} isError={notification.isError} />}
+      {/* {notification && <Notification message={notification.message} isError={notification.isError} />} */}
+      <Notification />
       {user ?
         <div>
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
@@ -104,4 +109,8 @@ const App = () => {
   )
 }
 
-export default App
+export default connect(null, { setNoti })(App)
+
+App.propTypes = {
+  setNoti: propTypes.func
+}
