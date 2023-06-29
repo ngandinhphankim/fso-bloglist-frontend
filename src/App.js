@@ -1,22 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react'
-import Notification from './components/Notification'
+import React, { useEffect, useRef, useState } from 'react'
 import Blog from './components/Blog'
-import blogService from './services/blogs'
-import authService from './services/auth'
 import BlogForm from './components/BlogForm'
-import Togglable from './components/Togglable'
 import LoginForm from './components/LoginForm'
-import { connect } from 'react-redux'
+import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 import { setNoti } from './redux/actions'
-import propTypes from 'prop-types'
+import authService from './services/auth'
+import blogService from './services/blogs'
+import { useDispatch } from 'react-redux'
 
-const App = ({ setNoti }) => {
+const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [notification, setNotification] = useState(null)
   const blogFormRef = useRef()
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedUser')
@@ -38,7 +37,6 @@ const App = ({ setNoti }) => {
 
     try {
       const loggedUser = await authService.login({ username, password })
-      console.log(loggedUser)
 
       window.localStorage.setItem('loggedUser', JSON.stringify(loggedUser))
 
@@ -47,8 +45,7 @@ const App = ({ setNoti }) => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setNotification({ message: exception.response.data.error, isError: true })
-      setTimeout(() => setNotification(null), 5000)
+      dispatch(setNoti({ message: exception.response.data.error, isError: true }))
     }
   }
 
@@ -62,23 +59,20 @@ const App = ({ setNoti }) => {
     try {
       const savedBlog = await blogService.createOne(newBlog)
       setBlogs(blogs.concat(savedBlog))
-      setNotification({ message: `a new blog ${savedBlog.title} by ${savedBlog.author} added`, isError: false })
-      setNoti({ message: `a new blog ${savedBlog.title} by ${savedBlog.author} added`, isError: false })
+      dispatch(setNoti({ message: `a new blog ${savedBlog.title} by ${savedBlog.author} added`, isError: false }))
     } catch (exception) {
-      setNotification({ message: exception.response.data.error, isError: true })
+      dispatch(setNoti({ message: exception.response.data.error, isError: true }))
     }
-    setTimeout(() => setNotification(null), 5000)
   }
 
   async function deleteBlog(blogId) {
     try {
       await blogService.deleteOne(blogId)
       setBlogs(blogs.filter(blog => blog.id !== blogId))
-      setNotification({ message: `successfully removed`, isError: false })
+      dispatch(setNoti({ message: `successfully removed`, isError: false }))
     } catch (exception) {
-      setNotification({ message: exception.response.data.error, isError: true })
+      dispatch(setNoti({ message: exception.response.data.error, isError: true }))
     }
-    setTimeout(() => setNotification(null), 5000)
   }
 
   async function likeBlog(blogId, blogToUpdate) {
@@ -88,7 +82,6 @@ const App = ({ setNoti }) => {
   return (
     <>
       <h1>blogs</h1>
-      {/* {notification && <Notification message={notification.message} isError={notification.isError} />} */}
       <Notification />
       {user ?
         <div>
@@ -109,8 +102,4 @@ const App = ({ setNoti }) => {
   )
 }
 
-export default connect(null, { setNoti })(App)
-
-App.propTypes = {
-  setNoti: propTypes.func
-}
+export default App
