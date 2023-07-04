@@ -4,17 +4,17 @@ import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
-import { setNoti } from './redux/actions'
+import { addBlog, setBlogs, setNoti } from './redux/actions'
 import authService from './services/auth'
 import blogService from './services/blogs'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const blogFormRef = useRef()
+  const blogs = useSelector(state => state.blog.blogs)
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const App = () => {
 
     (async () => {
       const blogs = await blogService.getAll()
-      setBlogs(blogs)
+      dispatch(setBlogs(blogs))
     })()
   }, [])
 
@@ -58,7 +58,7 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
     try {
       const savedBlog = await blogService.createOne(newBlog)
-      setBlogs(blogs.concat(savedBlog))
+      dispatch(addBlog(savedBlog))
       dispatch(setNoti({ message: `a new blog ${savedBlog.title} by ${savedBlog.author} added`, isError: false }))
     } catch (exception) {
       dispatch(setNoti({ message: exception.response.data.error, isError: true }))
@@ -68,7 +68,7 @@ const App = () => {
   async function deleteBlog(blogId) {
     try {
       await blogService.deleteOne(blogId)
-      setBlogs(blogs.filter(blog => blog.id !== blogId))
+      dispatch(deleteBlog(blogId))
       dispatch(setNoti({ message: `successfully removed`, isError: false }))
     } catch (exception) {
       dispatch(setNoti({ message: exception.response.data.error, isError: true }))
