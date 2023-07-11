@@ -4,7 +4,7 @@ import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
-import { addBlog, setBlogs, setNoti } from './redux/actions'
+import { addBlog, deleteBlog, setBlogs, setNoti, updateBlog } from './redux/actions'
 import authService from './services/auth'
 import blogService from './services/blogs'
 import { useDispatch, useSelector } from 'react-redux'
@@ -45,7 +45,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      dispatch(setNoti({ message: exception.response.data.error, isError: true }))
+      dispatch(setNoti({ message: exception.response?.data.error, isError: true }))
     }
   }
 
@@ -61,23 +61,28 @@ const App = () => {
       dispatch(addBlog(savedBlog))
       dispatch(setNoti({ message: `a new blog ${savedBlog.title} by ${savedBlog.author} added`, isError: false }))
     } catch (exception) {
-      dispatch(setNoti({ message: exception.response.data.error, isError: true }))
+      dispatch(setNoti({ message: exception.response?.data.error, isError: true }))
     }
   }
 
-  async function deleteBlog(blogId) {
+  async function removeBlog(blogId) {
     try {
       await blogService.deleteOne(blogId)
       dispatch(deleteBlog(blogId))
       dispatch(setNoti({ message: `successfully removed`, isError: false }))
     } catch (exception) {
-      dispatch(setNoti({ message: exception.response.data.error, isError: true }))
+      dispatch(setNoti({ message: exception.response?.data.error, isError: true }))
     }
   }
 
   async function likeBlog(blogId, blogToUpdate) {
-    await blogService.updateOne(blogId, blogToUpdate)
-  }
+    try {
+      await blogService.updateOne(blogId, blogToUpdate)
+      dispatch(updateBlog(blogToUpdate))
+      dispatch(setNoti({ message: `successfully liked`, isError: false }))
+    } catch (exception) {
+      dispatch(setNoti({ message: exception.response?.data.error, isError: true }))
+    }}
 
   return (
     <>
@@ -93,7 +98,7 @@ const App = () => {
 
           <div>
             {blogs.sort((a, b) => a.likes > b.likes).map(blog =>
-              <Blog key={blog.id} blog={blog} isOwner={user.username === blog.user.username} likeBlog={likeBlog} deleteBlog={deleteBlog} />
+              <Blog key={blog.id} blog={blog} isOwner={user.username === blog.user.username} likeBlog={likeBlog} deleteBlog={removeBlog} />
             )}
           </div>
         </div>

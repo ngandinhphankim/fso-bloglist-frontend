@@ -1,4 +1,4 @@
-import { ADD_BLOG, CLEAR_BLOGS, DELETE_BLOG, RESET_NOTI, SET_BLOGS, SET_NOTI } from "./actionTypes"
+import { ADD_BLOG, DELETE_BLOG, RESET_NOTI, SET_BLOGS, SET_NOTI, UPDATE_BLOG } from "./actionTypes"
 
 export const setNoti = ({ message, isError }) => {
     return {
@@ -18,6 +18,13 @@ export const addBlog = newBlog => {
     }
 }
 
+export const updateBlog = updatedBlog => {
+    return {
+        type: UPDATE_BLOG,
+        payload: updatedBlog
+    }
+}
+
 export const deleteBlog = blogId => {
     return {
         type: DELETE_BLOG,
@@ -30,8 +37,4 @@ export const setBlogs = blogs => {
         type: SET_BLOGS,
         payload: blogs
     }
-}
-
-export const clearBlogs = () => {
-    return { type: CLEAR_BLOGS }
 }

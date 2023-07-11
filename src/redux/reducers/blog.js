@@ -1,4 +1,4 @@
-import { ADD_BLOG, CLEAR_BLOGS, DELETE_BLOG, SET_BLOGS } from "../actionTypes";
+import { ADD_BLOG, DELETE_BLOG, SET_BLOGS, UPDATE_BLOG } from "../actionTypes";
 
 const initialState = {
     blogs: []
@@ -13,6 +13,15 @@ export default function (state = initialState, action) {
                 blogs: [...blogs.concat(action.payload)]
             }
 
+        case UPDATE_BLOG: {
+            // const updatedBlog = action.payload
+            // return {
+            //     ...state,
+            //     blogs: [updatedBlog].concat(blogs.filter(blog => blog.id !== updatedBlog.id))
+            // }
+            return state
+        }
+
         case DELETE_BLOG: {
             const blogId = action.payload
             return {
@@ -25,12 +34,6 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 blogs: [...action.payload]
-            }
-
-        case CLEAR_BLOGS:
-            return {
-                ...state,
-                blogs: []
             }
 
         default:

@@ -6,8 +6,8 @@ const Blog = ({ blog, isOwner, likeBlog, deleteBlog }) => {
   const [likes, setLikes] = useState(blog.likes)
 
   async function handleLike() {
-    likeBlog(blog.id, { likes: blog.likes + 1 })
-    setLikes(blog.likes + 1)
+    likeBlog(blog.id, { ...blog, likes: blog.likes + 1 })
+    // setLikes(blog.likes + 1)
   }
 
   function handleDelete() {
